@@ -52,6 +52,10 @@ Parcours : `GET /login`, `POST /login`, `GET /register`, `POST /register`. Les r
 
 La correction d'hydratation de l'entité `User`, le DSN MySQL et les placeholders du générateur sont conservés.
 
+## Validation avant synchronisation
+
+La procédure de validation de cette branche, comprenant la CI multi-versions et la recette manuelle avec MySQL, est décrite dans [docs/validation-starter.md](docs/validation-starter.md).
+
 ## Tests
 
 ```bash
