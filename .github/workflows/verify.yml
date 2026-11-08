@@ -1,20 +1,48 @@
 name: Validate MVC starter API JWT
+
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
 jobs:
   api:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.3', '8.4', '8.5']
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: ${{ matrix.php }}
           extensions: mbstring, intl, pdo_mysql
           tools: composer:v2
-      - run: composer install --no-interaction --prefer-dist
+          coverage: none
+      - name: Validate Composer manifest
+        run: composer validate --no-check-publish
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
       - name: PHP syntax
         run: find src public tests config -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Focused tests
         run: |
-          for test in tests/*_test.php tests/security/*.php; do php "$test"; done
+          set -e
+          for test in tests/*_test.php tests/security/*.php; do
+            php "$test"
+          done
+      - name: Starter structure and API isolation
+        run: |
+          test -f db.sql
+          test -f .env.example
+          test -f docs/guide-utilisation.md
+          grep -q 'CREATE TABLE IF NOT EXISTS `user`' db.sql
+          test -f src/Middleware/JwtMiddleware.php
+          test -f src/Middleware/RequestAuthenticationMiddleware.php
+          test ! -e src/Middleware/CsrfMiddleware.php
+          test ! -e src/Controller/LoginController.php
+          if grep -Eiq 'CREATE TABLE.*(book|lending|category)' db.sql; then
+            echo 'Business-specific SQL tables must not be part of the generic starter' >&2
+            exit 1
+          fi
