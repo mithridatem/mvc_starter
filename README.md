@@ -1,10 +1,22 @@
+# mvc_starter — web
+
+> Référence autonome du profil `web` de [mvc_script_generator](https://github.com/mithridatem/mvc_script_generator). Ce dépôt sert à **valider** les évolutions avant leur synchronisation dans le générateur.
+
+**Workflow :** évolution technique → validation ici (tests et review) → synchronisation du générateur → test d'un projet généré.
+
+Profils disponibles dans les branches : [basic](https://github.com/mithridatem/mvc_starter/tree/feat/basic-reference), [Web session/CSRF](https://github.com/mithridatem/mvc_starter/tree/variant/web), [API JWT](https://github.com/mithridatem/mvc_starter/tree/variant/api-jwt).
+
+**Ne pas synchroniser de logique métier vers le générateur.** Les exercices sur les livres et les cas d'utilisation IDOR restent dans `project_exemple`.
+
+---
+
 # MVC Advanced — Web : sessions PHP + protection CSRF
 
 ## Guide pas à pas
 
 Après génération, consulter **[docs/guide-utilisation.md](docs/guide-utilisation.md)** pour comprendre le parcours des requêtes, le rôle des composants et ajouter une fonctionnalité pas à pas.
 
-Profil pédagogique basé sur [project_exemple / variant/web-session-csrf](https://github.com/evaluationWeb/project_exemple/tree/variant/web-session-csrf), consacré au Web avec sessions et CSRF.
+Ce profil de référence est indépendant de l'application métier `project_exemple`.
 
 Il utilise `mithridatem/router`, `mithridatem/validation` et `mithridatem/autowiring`. Authentification HTML en session PHP, `grants` de routes et vérification CSRF dans le **middleware** (plus dans les contrôleurs).
 
