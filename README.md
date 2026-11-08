@@ -16,11 +16,11 @@ Profils disponibles dans les branches : [basic](https://github.com/mithridatem/m
 
 Après génération, consulter **[docs/guide-utilisation.md](docs/guide-utilisation.md)** pour comprendre le parcours des requêtes, le rôle des composants et ajouter une fonctionnalité pas à pas.
 
-Profil pédagogique dérivé de [project_exemple, branche `variant/api-jwt`](https://github.com/evaluationWeb/project_exemple/tree/variant/api-jwt). **API REST uniquement** : pas de session PHP, pas de vues HTML, pas de CSRF cookie. Les routes utilisent toujours `grants`.
+Profil de référence autonome, initialement dérivé de `project_exemple` et désormais indépendant de son domaine métier. **API REST uniquement** : pas de session PHP, pas de vues HTML, pas de CSRF cookie. Les routes utilisent toujours `grants`.
 
 ## Environnements
 
-Le générateur crée un `.env` local avec un JWT_SECRET aléatoire ; le fichier est ignoré par Git. En production, définir `APP_ENV=prod` dans l'hébergement et injecter les secrets directement (pas de `.env.prod`). `JWT_TTL_SECONDS=900` est personnalisable. Voir [docs/environments.md](docs/environments.md).
+Dans ce dépôt de référence, copier `.env.example` dans `.env` et générer un `JWT_SECRET` aléatoire ; `.env` est ignoré par Git. Le générateur automatise cette étape pour les projets distribués. En production, définir `APP_ENV=prod` dans l'hébergement et injecter les secrets directement (pas de `.env.prod`). `JWT_TTL_SECONDS=900` est personnalisable. Voir [docs/environments.md](docs/environments.md).
 
 ## Installation
 
@@ -58,6 +58,10 @@ curl http://127.0.0.1:8000/api/profile \
 - `src/Kernel/ApiErrorHandler.php` : erreurs HTTP rendues en JSON.
 
 `Controller/Api` : endpoints JSON ; `Security/Jwt` : émission et validation ; `Security/Authentication` : identité pendant la requête ; `Middleware` : contrôle transversal ; `Repository` : PDO ; `Service` : métier.
+
+## Validation avant synchronisation
+
+Voir [docs/validation-starter.md](docs/validation-starter.md) pour la matrice CI, les tests adversariaux JWT et la recette manuelle MySQL.
 
 ## Vérification
 
