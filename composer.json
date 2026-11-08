@@ -1,0 +1,19 @@
+{
+  "name": "training/mvc_starter_api",
+  "type": "project",
+  "require": {
+    "php": "^8.2",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "mithridatem/router": "^1.7.1",
+    "mithridatem/validation": "^1.2.1",
+    "mithridatem/autowiring": "^1.4.2",
+    "firebase/php-jwt": "^7.2",
+    "vlucas/phpdotenv": "^5.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  }
+}
