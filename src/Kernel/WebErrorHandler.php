@@ -14,6 +14,11 @@ use Throwable;
 /** Converts errors into minimal, safely escaped HTML responses. */
 final class WebErrorHandler
 {
+    /**
+     * Traduit une exception en réponse HTML échappée et définit le statut HTTP adapté ; masque les erreurs internes (500).
+     * @param Throwable $error Exception survenue pendant le traitement HTTP.
+     * @return void
+     */
     public function handle(Throwable $error): void
     {
         $status = match (true) {

@@ -10,12 +10,21 @@ use PDO;
 
 final class UserRepository extends AbstractRepository
 {
+    /**
+     *
+     * @param PDO $connect Connexion PDO injectée par le conteneur.
+     */
     public function __construct(PDO $connect)
     {
         return parent::__construct($connect);
     }
 
     #[Override]
+    /**
+     * Recherche un utilisateur par identifiant et hydrate son entité.
+     * @param int $id Identifiant en base de données.
+     * @return User|null Utilisateur trouvé ou null.
+     */
     public function find(int $id): ?User
     {
         $sql = <<<SQL
@@ -40,6 +49,10 @@ final class UserRepository extends AbstractRepository
     }
 
     #[Override]
+    /**
+     * Récupère les colonnes publiques de tous les utilisateurs sous forme de tableaux associatifs.
+     * @return list<array<string, mixed>> Lignes issues de la base de données.
+     */
     public function findAll(): array
     {
         $sql = <<<SQL
@@ -52,6 +65,12 @@ final class UserRepository extends AbstractRepository
     }
 
     #[Override]
+    /**
+     * Enregistre une entité User, renseigne son identifiant et renvoie null si l'insertion échoue.
+     * @param Entity $entity Entité à insérer ; doit être un utilisateur.
+     * @return User|null Entité persistée ou null en cas d'erreur PDO.
+     * @throws \InvalidArgumentException Si l'entité n'est pas un User.
+     */
     public function create(Entity $entity): ?User
     {
         if (!$entity instanceof User) {
@@ -83,6 +102,11 @@ final class UserRepository extends AbstractRepository
         }
     }
 
+    /**
+     * Recherche un utilisateur via son adresse email et hydrate l'entité.
+     * @param string $email Adresse email exacte.
+     * @return User|null Utilisateur trouvé ou null.
+     */
     public function findByEmail(string $email): ?User
     {
         $sql = <<<SQL

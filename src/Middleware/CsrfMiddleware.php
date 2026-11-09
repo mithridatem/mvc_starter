@@ -17,8 +17,20 @@ use Mithridatem\Routing\Middleware\MiddlewareInterface;
  */
 final class CsrfMiddleware implements MiddlewareInterface
 {
+    /**
+     *
+     * @param CsrfTokenManager $tokens Gestionnaire des jetons CSRF associés à la session.
+     */
     public function __construct(private CsrfTokenManager $tokens) {}
 
+    /**
+     * Vérifie le jeton CSRF d'une requête POST avant de passer au prochain traitement. Le chemin HTTP est utilisé comme identifiant du formulaire.
+     * @param RequestContextInterface $context Requête à protéger.
+     * @param callable $next Prochaine étape du pipeline de middlewares.
+     * @return mixed Résultat de l'étape suivante.
+     * @throws \LogicException Si le contexte ou la méthode HTTP sont incompatibles.
+     * @throws InvalidCsrfTokenException Si le jeton est invalide.
+     */
     public function process(RequestContextInterface $context, callable $next): mixed
     {
         if (!$context instanceof RequestInterface) {

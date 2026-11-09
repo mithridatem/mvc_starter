@@ -11,13 +11,28 @@ use Mithridatem\Validation\Validator;
 
 final class LoginService
 {
+    /**
+     * Initialise les dépendances du service.
+     *
+     *
+     * @param UserRepository $users Dépôt des utilisateurs.
+     *
+     * @param Validator $validator Validation des identifiants soumis.
+     *
+     * @param PasswordHasher $hasher Vérification des mots de passe.
+     */
     public function __construct(
         private UserRepository $users,
         private Validator $validator,
         private PasswordHasher $hasher,
     ) {}
 
-    /** @return array{validation?: array, errors?: string, user?: \App\Entity\User} */
+    /**
+     * Valide les identifiants et vérifie le mot de passe sans gérer directement la session HTTP.
+     *
+     * @param LoginInput $input Identifiants soumis.
+     * @return array{validation?: array, errors?: string, user?: \App\Entity\User} Utilisateur authentifié ou erreurs destinées au contrôleur.
+     */
     public function login(LoginInput $input): array
     {
         $violations = $this->validator->validate($input);

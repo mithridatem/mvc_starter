@@ -7,6 +7,10 @@ use PDO;
 
 abstract class AbstractRepository
 {
+    /**
+     *
+     * @param PDO $connect Connexion PDO partagée avec les repositories concrets.
+     */
     public function __construct(protected PDO $connect) {}
 
     /**

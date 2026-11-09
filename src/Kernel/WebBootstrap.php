@@ -10,6 +10,12 @@ namespace App\Kernel;
  */
 final class WebBootstrap
 {
+    /**
+     * Initialise l'environnement, les en-têtes de sécurité et la session PHP si nécessaire.
+     * @param string $rootPath Chemin racine utilisé pour charger la configuration d'environnement.
+     * @return void
+     * @throws \InvalidArgumentException Si APP_ENV est invalide.
+     */
     public function boot(string $rootPath): void
     {
         (new EnvironmentLoader())->load($rootPath);
