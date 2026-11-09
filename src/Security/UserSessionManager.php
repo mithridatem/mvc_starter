@@ -9,6 +9,12 @@ use App\Entity\User;
 /** Encapsule la représentation de l'utilisateur authentifié en session PHP. */
 final class UserSessionManager
 {
+    /**
+     * Authentifie l'utilisateur en session, régénère l'identifiant et conserve son ID, son email et ses rôles.
+     * @param User $user Utilisateur authentifié.
+     * @return void
+     * @throws \LogicException Si aucune session PHP n'est active.
+     */
     public function login(User $user): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -27,6 +33,11 @@ final class UserSessionManager
         ];
     }
 
+    /**
+     * Déconnecte l'utilisateur, efface ses données d'authentification et régénère l'identifiant de session.
+     * @return void
+     * @throws \LogicException Si aucune session PHP n'est active.
+     */
     public function logout(): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
