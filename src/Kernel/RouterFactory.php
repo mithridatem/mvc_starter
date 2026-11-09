@@ -17,11 +17,20 @@ use Mithridatem\Routing\Router;
  */
 final class RouterFactory
 {
+    /**
+     *
+     * @param Container $container Conteneur servant à résoudre contrôleurs et middlewares.
+     * @param string $rootPath Racine du projet contenant les contrôleurs.
+     */
     public function __construct(
         private Container $container,
         private string $rootPath
     ) {}
 
+    /**
+     * Construit un routeur Web avec découverte des routes par attributs, résolution via le conteneur et contrôle des accès en session.
+     * @return Router Routeur configuré.
+     */
     public function create(): Router
     {
         $router = new Router();
