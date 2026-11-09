@@ -13,9 +13,13 @@ use Mithridatem\Validation\Validator;
 final class UserService
 {
     /**
+     * Initialise les dépendances du service.
+     *
      *
      * @param UserRepository $userRepository Accès aux utilisateurs persistés.
+     *
      * @param Validator $validator Validateur des données d'inscription.
+     *
      * @param PasswordHasher $passwordHasher Service de hachage des mots de passe.
      */
     public function __construct(
@@ -26,6 +30,7 @@ final class UserService
 
     /**
      * Exécute l'inscription : valide les champs, vérifie l'unicité de l'email, hache le mot de passe et crée l'utilisateur.
+     *
      * @param RegisterUserInput $input Informations d'inscription validables.
      * @return array{validation?: array, errors?: string, success?: string} Résultat destiné à la vue.
      */
@@ -52,6 +57,7 @@ final class UserService
 
     /**
      * Regroupe les violations de contraintes et la vérification de confirmation du mot de passe.
+     *
      * @param RegisterUserInput $input Données du formulaire à contrôler.
      * @return array{validation?: array, errors?: string} Erreurs à afficher, ou tableau vide.
      */
@@ -72,6 +78,7 @@ final class UserService
 
     /**
      * Construit un utilisateur à partir du DTO et attribue le rôle utilisateur standard.
+     *
      * @param RegisterUserInput $input Données d'inscription à enregistrer.
      * @return User Entité dont le mot de passe est haché.
      */
