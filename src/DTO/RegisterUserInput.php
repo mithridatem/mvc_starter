@@ -14,26 +14,10 @@ use Mithridatem\Validation\Attributes\NotBlank;
  */
 final readonly class RegisterUserInput
 {
-    public function __construct(
-        #[NotBlank]
-        #[Length(min: 2, max: 50)]
-        public ?string $firstname,
-        #[NotBlank]
-        #[Length(min: 2, max: 50)]
-        public ?string $lastname,
-        #[NotBlank]
-        #[Email]
-        public ?string $email,
-        #[NotBlank]
-        #[Length(min: 4, max: 50)]
-        public ?string $password,
-        #[NotBlank]
-        public ?string $confirmPassword,
-    ) {}
-
     /**
-     * Conversion défensive : un champ de formulaire peut être un tableau.
-     * Ne jamais modifier silencieusement les caractères du mot de passe.
+     * Transforme les champs bruts d'inscription en DTO : nettoie les champs textuels mais préserve les mots de passe. Les valeurs non textuelles deviennent null.
+     * @param array<string, mixed> $data Tableau issu du formulaire.
+     * @return self Entrée d'inscription à valider.
      */
     public static function fromArray(array $data): self
     {
