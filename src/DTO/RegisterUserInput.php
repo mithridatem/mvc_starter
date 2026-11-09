@@ -15,8 +15,38 @@ use Mithridatem\Validation\Attributes\NotBlank;
 final readonly class RegisterUserInput
 {
     /**
-     * Transforme les champs bruts d'inscription en DTO : nettoie les champs textuels mais préserve les mots de passe. Les valeurs non textuelles deviennent null.
-     * @param array<string, mixed> $data Tableau issu du formulaire.
+     * Construit les données d'inscription sans logique de persistance.
+     *
+     * @param string|null $firstname Prénom du formulaire.
+     * @param string|null $lastname Nom du formulaire.
+     * @param string|null $email Adresse email.
+     * @param string|null $password Mot de passe non modifié.
+     * @param string|null $confirmPassword Confirmation non modifiée.
+     */
+    public function __construct(
+        #[NotBlank]
+        #[Length(min: 2, max: 50)]
+        public ?string $firstname,
+        #[NotBlank]
+        #[Length(min: 2, max: 50)]
+        public ?string $lastname,
+        #[NotBlank]
+        #[Email]
+        public ?string $email,
+        #[NotBlank]
+        #[Length(min: 4, max: 50)]
+        public ?string $password,
+        #[NotBlank]
+        public ?string $confirmPassword,
+    ) {}
+
+    /**
+     * Convertit un tableau de champs HTTP en DTO d'inscription.
+     *
+     * Les champs textuels sont nettoyés ; les mots de passe sont préservés.
+     * Une valeur non textuelle est remplacée par null.
+     *
+     * @param array<string, mixed> $data Champs issus du formulaire.
      * @return self Entrée d'inscription à valider.
      */
     public static function fromArray(array $data): self
