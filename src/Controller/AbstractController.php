@@ -7,26 +7,62 @@ use Mithridatem\Routing\Http\RequestInterface;
 abstract class AbstractController
 {
     /**
-     * Méthode pour rendre une vue avec un template
-     * @param string $template Le nom du template à inclure
-     * @param string|null $title Le titre de la page
-     * @param array $data Les données à passer au template
-     * @return mixed
+     * Rend un template HTML complet et retourne son contenu.
+     *
+     * Les variables $title et $data sont accessibles dans le template.
      */
-    protected function render(string $template, ?string $title, array $data = []): mixed
+    protected function render(string $template, ?string $title = null, array $data = []): string
     {
-        return include __DIR__ . "/../../template/template_" . $template . ".php";
+        return $this->renderFile(
+            __DIR__ . '/../../template/template_' . $this->validateViewName($template) . '.php',
+            $data,
+            $title
+        );
     }
 
     /**
-     * Méthode pour générer un composant
-     * @param string $component Le nom du template à inclure
-     * @param array $data Les données à passer au composant
-     * @return void
+     * Rend un composant HTML réutilisable et retourne son contenu.
+     *
+     * Les données sont accessibles via $data dans le composant.
      */
-    protected function renderComponent(string $component, array $data = []): void
+    protected function renderComponent(string $component, array $data = []): string
     {
-        include __DIR__ . "/../../template/component/component_" . $component . ".php";
+        return $this->renderFile(
+            __DIR__ . '/../../template/component/component_' . $this->validateViewName($component) . '.php',
+            $data
+        );
+    }
+
+    /**
+     * Charge un fichier PHP dans un buffer isolé et nettoie celui-ci en cas d'erreur.
+     */
+    private function renderFile(string $file, array $data, ?string $title = null): string
+    {
+        if (!is_file($file)) {
+            throw new \\RuntimeException('Vue introuvable : ' . basename($file));
+        }
+
+        ob_start();
+
+        try {
+            require $file;
+            return (string) ob_get_clean();
+        } catch (\\Throwable $error) {
+            ob_end_clean();
+            throw $error;
+        }
+    }
+
+    /**
+     * N'autorise que des noms simples (pas de chemin arbitraire).
+     */
+    private function validateViewName(string $name): string
+    {
+        if (!preg_match('/\\A[a-zA-Z0-9_-]+\\z/D', $name)) {
+            throw new \\InvalidArgumentException('Nom de vue invalide.');
+        }
+
+        return $name;
     }
 
     /**
