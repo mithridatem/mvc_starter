@@ -19,13 +19,13 @@
                    value="<?= htmlspecialchars($data['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
             <fieldset>
                 <input type="text" name="firstname" placeholder="saisir votre Prénom">
-                <?php $this->renderComponent("error_validation", ["errors" => $data["validation"]["firstname"] ?? []]); ?>
+                <?= $this->renderComponent("error_validation", ["errors" => $data["validation"]["firstname"] ?? []]) ?>
                 <input type="text" name="lastname" placeholder="saisir votre Nom">
-                <?php $this->renderComponent("error_validation", ["errors" => $data["validation"]["lastname"] ?? []]); ?>
+                <?= $this->renderComponent("error_validation", ["errors" => $data["validation"]["lastname"] ?? []]) ?>
                 <input type="email" name="email" placeholder="saisir votre Email">
-                <?php $this->renderComponent("error_validation", ["errors" => $data["validation"]["email"] ?? []]); ?>
+                <?= $this->renderComponent("error_validation", ["errors" => $data["validation"]["email"] ?? []]) ?>
                 <input type="password" name="password" placeholder="saisir votre mot de passe">
-                <?php $this->renderComponent("error_validation", ["errors" => $data["validation"]["password"] ?? []]); ?>
+                <?= $this->renderComponent("error_validation", ["errors" => $data["validation"]["password"] ?? []]) ?>
                 <input type="password" name="confirm_password" placeholder="confimer votre mot de passe">
                 <input type="submit" value="ajouter" name="submit">
             </fieldset>

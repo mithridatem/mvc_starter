@@ -23,11 +23,11 @@
                         ) ?>">
             <label for="email">Email</label>
             <input id="email" type="email" name="email" autocomplete="username" required>
-            <?php $this->renderComponent('error_validation', ['errors' => $data['validation']['email'] ?? []]); ?>
+            <?= $this->renderComponent('error_validation', ['errors' => $data['validation']['email'] ?? []]) ?>
 
             <label for="password">Mot de passe</label>
             <input id="password" type="password" name="password" autocomplete="current-password" required>
-            <?php $this->renderComponent('error_validation', ['errors' => $data['validation']['password'] ?? []]); ?>
+            <?= $this->renderComponent('error_validation', ['errors' => $data['validation']['password'] ?? []]) ?>
 
             <?php if (!empty($data['errors'])): ?>
                 <p role="alert"><?= htmlspecialchars($data['errors'], ENT_QUOTES, 'UTF-8') ?></p>

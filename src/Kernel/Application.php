@@ -32,7 +32,10 @@ final class Application
         $navigation = new GuestNavigation();
 
         try {
-            $router->dispatch($request);
+            $response = $router->dispatch($request);
+            if (is_string($response)) {
+                echo $response;
+            }
             $navigation->rememberSuccessfulGet($request, $router);
         } catch (Throwable $error) {
             if ($error instanceof UnauthorizedException) {

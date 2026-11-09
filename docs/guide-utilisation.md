@@ -121,6 +121,28 @@ $container->factory(
 
 Pour un paramètre scalaire, utiliser `configure()`, comme pour `UploadFileService`. Les services métiers ne doivent pas manipuler eux-mêmes le conteneur.
 
+## Rendu des templates et composants
+
+Dans le profil Web avancé, `AbstractController::render($template, $title, $data)` retourne désormais une **chaîne HTML**. Chaque fichier `template/template_<nom>.php` représente une page HTML complète (sans layout imposé). Les variables `$title` et `$data` sont disponibles directement dans la vue.
+
+```php
+public function home(): string
+{
+    return $this->render('home', 'Accueil', ['message' => 'Bienvenue']);
+}
+```
+
+Pour intégrer un composant dans une page, utiliser **`echo` ou `<?= ... ?>`** : `renderComponent()` retourne aussi une chaîne et n'écrit plus directement dans la sortie.
+
+```php
+<h1><?= htmlspecialchars($data['message'], ENT_QUOTES, 'UTF-8') ?></h1>
+<?= $this->renderComponent('error_validation', ['errors' => $data['errors'] ?? []]) ?>
+```
+
+Les deux méthodes utilisent un buffer interne commun, nettoyé en cas d'exception. Les noms de vues et composants doivent être des identifiants simples (lettres, chiffres, `_`, `-`) et ne doivent jamais être dérivés directement d'une entrée utilisateur. Un fichier absent déclenche une `RuntimeException`. Le point d'entrée Web affiche la chaîne renvoyée par le routeur. Il n'y a aucun changement pour les profils basic et API JWT.
+
+Vérifier ce comportement avec `php tests/template_render_test.php` et `php tests/auth_form_render_test.php`.
+
 ## 7. Tests et vérifications
 
 ```bash
