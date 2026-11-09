@@ -16,8 +16,16 @@ use Throwable;
  */
 final class Application
 {
+    /**
+     * Initialise l'application avec le chemin racine du projet.
+     * @param string $rootPath Racine contenant config/, src/ et public/.
+     */
     public function __construct(private string $rootPath) {}
 
+    /**
+     * Démarre l'environnement Web, résout la route et écrit une éventuelle réponse HTML. Les erreurs de dispatch sont déléguées au gestionnaire Web ; les accès invités refusés peuvent déclencher une redirection locale.
+     * @return void
+     */
     public function run(): void
     {
         (new WebBootstrap())->boot($this->rootPath);
