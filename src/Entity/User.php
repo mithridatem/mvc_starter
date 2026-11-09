@@ -140,6 +140,10 @@ class User implements Entity
         return $this;
     }
 
+    /**
+     * Hache le mot de passe actuellement stocké dans l'entité. À utiliser uniquement si sa valeur est encore en clair.
+     * @return void
+     */
     public function hashPassword(): void
     {
         $this->hashPassword = password_hash(
@@ -148,6 +152,11 @@ class User implements Entity
         );
     }
 
+    /**
+     * Vérifie un mot de passe en clair contre l'empreinte portée par cette entité.
+     * @param string $clearPassword Mot de passe à vérifier.
+     * @return bool Vrai si le mot de passe correspond.
+     */
     public function passwordVerify(string $clearPassword): bool
     {
         return password_verify(
@@ -156,6 +165,12 @@ class User implements Entity
         );
     }
 
+    /**
+     * Reconstruit une entité User à partir d'une ligne associative PDO, en convertissant les colonnes dates. L'identifiant n'est pas initialisé ici : le repository le renseigne.
+     * @param array<string, mixed> $user Ligne de données issue de la base SQL.
+     * @return User Entité hydratée.
+     * @throws \UnexpectedValueException Si une date est incorrecte.
+     */
     public static function hydrate(array $user): User
     {
         $hydrateUser = new User(
@@ -182,6 +197,12 @@ class User implements Entity
         return $hydrateUser;
     }
 
+    /**
+     * Convertit une date SQL nullable en DateTimeImmutable, sans modifier une instance déjà typée.
+     * @param mixed $date Date SQL en chaîne, DateTimeImmutable ou null.
+     * @return \DateTimeImmutable|null Date convertie ou null.
+     * @throws \UnexpectedValueException Si la date est d'un type ou d'un format invalide.
+     */
     private static function hydrateDate(mixed $date): ?\DateTimeImmutable
     {
         if ($date === null) {
