@@ -26,6 +26,12 @@ final class EnvironmentLoader
         'JWT_TTL_SECONDS',
     ];
 
+    /**
+     * Charge les variables d'environnement du processus ; en développement et en test, charge aussi le fichier dotenv correspondant. N'accède jamais aux fichiers .env en production.
+     * @param string $rootPath Répertoire contenant les fichiers .env et .env.test.
+     * @return void
+     * @throws \InvalidArgumentException Si APP_ENV n'est ni dev, test, ni prod.
+     */
     public function load(string $rootPath): void
     {
         $environment = getenv('APP_ENV');
