@@ -39,7 +39,7 @@ abstract class AbstractController
     private function renderFile(string $file, array $data, ?string $title = null): string
     {
         if (!is_file($file)) {
-            throw new \\RuntimeException('Vue introuvable : ' . basename($file));
+            throw new \RuntimeException('Vue introuvable : ' . basename($file));
         }
 
         ob_start();
@@ -47,7 +47,7 @@ abstract class AbstractController
         try {
             require $file;
             return (string) ob_get_clean();
-        } catch (\\Throwable $error) {
+        } catch (\Throwable $error) {
             ob_end_clean();
             throw $error;
         }
@@ -58,8 +58,8 @@ abstract class AbstractController
      */
     private function validateViewName(string $name): string
     {
-        if (!preg_match('/\\A[a-zA-Z0-9_-]+\\z/D', $name)) {
-            throw new \\InvalidArgumentException('Nom de vue invalide.');
+        if (!preg_match('/\A[a-zA-Z0-9_-]+\z/D', $name)) {
+            throw new \InvalidArgumentException('Nom de vue invalide.');
         }
 
         return $name;
