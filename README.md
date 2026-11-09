@@ -70,6 +70,7 @@ php tests/csrf_route_configuration_test.php
 php tests/form_submission_test.php
 php tests/user_session_manager_test.php
 php tests/auth_form_render_test.php
+php tests/template_render_test.php
 php tests/request_dto_mapping_test.php
 ```
 
