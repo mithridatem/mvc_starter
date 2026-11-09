@@ -19,6 +19,7 @@ final class GuestNavigation
 
     /**
      * Définit la page locale de repli utilisée après un refus d'accès à une route réservée aux invités.
+     *
      * @param string $fallbackPath Chemin absolu local, sans query string ni fragment.
      * @throws \InvalidArgumentException Si la destination est externe ou invalide.
      */
@@ -31,7 +32,9 @@ final class GuestNavigation
 
     /**
      * Mémorise en session la dernière page GET locale et accessible, afin de retrouver une destination sûre.
+     *
      * @param RequestContextInterface $request Requête HTTP traitée avec succès.
+     *
      * @param Router $router Routeur permettant de vérifier l'accès.
      * @return void
      */
@@ -48,12 +51,10 @@ final class GuestNavigation
     }
 
     /**
-     * Returns a safe local destination only for a logged-in user denied on
-     * a guest-only route. Other unauthorized errors keep their normal 403.
-     */
-    /**
      * Détermine une destination locale accessible pour un utilisateur connecté refusé sur une route IS_GUEST.
+     *
      * @param RequestContextInterface $request Requête refusée.
+     *
      * @param Router $router Routeur utilisé pour valider la destination.
      * @return string|null Chemin de redirection sûr ou null pour conserver la réponse 403.
      */
@@ -81,7 +82,9 @@ final class GuestNavigation
 
     /**
      * Vérifie qu'un chemin local correspond à une route GET autorisée pour l'utilisateur courant et non réservée aux invités.
+     *
      * @param string $path Chemin à vérifier.
+     *
      * @param Router $router Routeur applicatif.
      * @return bool Vrai si la page peut être visitée.
      */
@@ -101,8 +104,11 @@ final class GuestNavigation
 
     /**
      * Retrouve la route correspondant au chemin et à la méthode, en tenant compte du préfixe du routeur.
+     *
      * @param string $path Chemin local demandé.
+     *
      * @param string $method Méthode HTTP.
+     *
      * @param Router $router Routeur contenant les routes.
      * @return \Mithridatem\Routing\RouteInterface|null Route correspondante ou null.
      */
@@ -146,6 +152,7 @@ final class GuestNavigation
 
     /**
      * Valide un chemin absolu local : interdit URL protocol-relative, antislashs, contrôles, query string et fragment.
+     *
      * @param string $path Chemin à contrôler.
      * @return bool Vrai si le chemin est local et sûr pour la navigation.
      */
