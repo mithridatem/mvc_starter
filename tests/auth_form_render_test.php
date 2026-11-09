@@ -34,10 +34,12 @@ function controllerForRender(string $class, CsrfTokenManager $csrf): object
 
 function captureForm(callable $callback): string
 {
+    // Les contrôleurs retournent désormais le HTML au lieu de l'écrire directement.
     ob_start();
     try {
-        $callback();
-        return (string) ob_get_contents();
+        $html = $callback();
+        assertForm(ob_get_contents() === '', 'Le rendu ne doit pas produire de sortie directe');
+        return (string) $html;
     } finally {
         ob_end_clean();
     }
