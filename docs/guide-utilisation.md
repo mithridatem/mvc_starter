@@ -195,3 +195,22 @@ php tests/security/reproduce_repository_leak.php
 
 Ces tests ne remplacent pas une validation avec une base MySQL réelle,
 un serveur HTTP et des paramètres HTTPS de production.
+
+## Convention PDO pour les repositories
+
+Lorsque vous ajoutez une requête SQL avec paramètres :
+
+- Utiliser des paramètres positionnels `?` (indices PDO à partir de 1).
+- Préparer la requête, associer chaque valeur avec `bindValue($position, $value, PDO::PARAM_*)`, puis appeler `execute()` sans argument.
+- Choisir explicitement `PDO::PARAM_INT`, `PDO::PARAM_STR`, `PDO::PARAM_BOOL` ou `PDO::PARAM_NULL` selon la valeur réellement transmise.
+- Utiliser `bindParam()` uniquement si une liaison par référence est nécessaire (valeur de la variable susceptible de changer avant `execute()`).
+- Conserver `query()` pour une requête statique sans entrée paramétrée.
+- Garder les requêtes et leurs liaisons visibles dans le repository ; `AbstractRepository` reste réservé à la connexion PDO et aux méthodes abstraites communes, sans helper de binding.
+
+Exemple :
+
+```php
+$stmt = $this->connect->prepare('SELECT * FROM user WHERE id_user = ?');
+$stmt->bindValue(1, $id, PDO::PARAM_INT);
+$stmt->execute();
+```
