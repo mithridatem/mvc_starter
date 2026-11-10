@@ -65,15 +65,21 @@ final class UserRepository extends AbstractRepository
 
         try {
             $stmt = $this->connect->prepare($sql);
-            $stmt->execute([
-                $entity->getFirstname(),
-                $entity->getLastname(),
-                $entity->getEmail(),
-                $entity->getHashPassword(),
-                $entity->getCreatedAt()->format('Y-m-d H:i:s'),
-                $entity->getImgProfil(),
-                $entity->getGrant(),
-            ]);
+            $firstname = $entity->getFirstname();
+            $lastname = $entity->getLastname();
+            $email = $entity->getEmail();
+            $password = $entity->getHashPassword();
+            $image = $entity->getImgProfil();
+            $grant = $entity->getGrant();
+
+            $stmt->bindValue(1, $firstname, $firstname === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(2, $lastname, $lastname === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(3, $email, $email === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(4, $password, $password === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(5, $entity->getCreatedAt()->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+            $stmt->bindValue(6, $image, $image === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->bindValue(7, $grant, $grant === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $stmt->execute();
 
             $entity->setId((int) $this->connect->lastInsertId());
             return $entity;
@@ -94,7 +100,8 @@ final class UserRepository extends AbstractRepository
             SQL;
 
         $stmt = $this->connect->prepare($sql);
-        $stmt->execute([$email]);
+        $stmt->bindValue(1, $email, PDO::PARAM_STR);
+        $stmt->execute();
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if ($data === false) {
