@@ -146,3 +146,22 @@ php -l src/Controller/SalutController.php
 Exercices suggérés : page avec paramètre, service de calcul, puis repository PDO. Lorsque plusieurs services dépendent les uns des autres, passer au profil **Advanced**, qui illustre l'injection automatique de dépendances.
 
 **Limites :** ce projet est un point de départ pour l'apprentissage. Il ne fournit ni authentification, ni protection CSRF, ni stratégie de tests applicatifs complète. Ajouter les protections adaptées avant une mise en production.
+
+## Convention PDO pour les repositories
+
+Lorsque vous ajoutez une requête SQL avec paramètres :
+
+- Utiliser des paramètres positionnels `?` (indices PDO à partir de 1).
+- Préparer la requête, associer chaque valeur avec `bindValue($position, $value, PDO::PARAM_*)`, puis appeler `execute()` sans argument.
+- Choisir explicitement `PDO::PARAM_INT`, `PDO::PARAM_STR`, `PDO::PARAM_BOOL` ou `PDO::PARAM_NULL` selon la valeur réellement transmise.
+- Utiliser `bindParam()` uniquement si une liaison par référence est nécessaire (valeur de la variable susceptible de changer avant `execute()`).
+- Conserver `query()` pour une requête statique sans entrée paramétrée.
+- Garder les requêtes et leurs liaisons visibles dans le repository ; `AbstractRepository` reste réservé à la connexion PDO et aux méthodes abstraites communes, sans helper de binding.
+
+Exemple :
+
+```php
+$stmt = $this->connect->prepare('SELECT * FROM user WHERE id_user = ?');
+$stmt->bindValue(1, $id, PDO::PARAM_INT);
+$stmt->execute();
+```
