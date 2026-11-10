@@ -16,7 +16,7 @@ Profils disponibles dans les branches : [basic](https://github.com/mithridatem/m
 
 Après génération, consulter **[docs/guide-utilisation.md](docs/guide-utilisation.md)** pour comprendre le parcours des requêtes, le rôle des composants et ajouter une fonctionnalité pas à pas.
 
-Ce projet utilise seulement `mithridatem/router` : pas de conteneur ni de librairie de validation.
+Ce projet utilise `mithridatem/router` et `vlucas/phpdotenv` : pas de conteneur ni de librairie de validation.
 
 ```sh
 composer install
@@ -42,7 +42,8 @@ php tests/form_request_test.php
 - `src/Controller` : entrée/sortie HTTP.
 - `src/Service` : logique métier.
 - `src/Repository` : persistance PDO.
+- `src/Database/Mysql.php` : connexion PDO MySQL facultative.
 - `src/Entity` : objets métier.
 - `templates` : vues.
 
-Le squelette n'a pas besoin de MySQL pour la page d'accueil. La configuration `.env` sert d'exemple et n'est pas lue automatiquement.
+Le squelette n'a pas besoin de MySQL pour la page d'accueil. Le fichier `.env`, s'il existe, est chargé par Dotenv, sans établir de connexion MySQL au démarrage. Pour utiliser une base : copier `.env.example` en `.env`, compléter les paramètres et appeler `Mysql::connectBdd()` au moment de construire un repository. Voir le guide d'utilisation.

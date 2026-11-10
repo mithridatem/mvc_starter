@@ -13,7 +13,7 @@ php -S 127.0.0.1:8000 -t public
 
 Ouvrir [http://127.0.0.1:8000/](http://127.0.0.1:8000/). Il n'est pas nécessaire de créer une base MySQL pour afficher l'accueil.
 
-Le fichier `.env` est seulement fourni à titre d'exemple dans ce profil : il **n'est pas chargé automatiquement**.
+Le fichier `.env` est chargé s'il existe, mais aucune connexion MySQL n'est ouverte au démarrage.
 
 ## 2. Comprendre le parcours d'une requête
 
@@ -39,6 +39,7 @@ AbstractController::render() -> templates/home.php -> HTML
 | `src/Controller/` | Reçoit la demande HTTP et décide du rendu |
 | `src/Service/` | Regroupe la logique métier |
 | `src/Repository/` | Emplacement prévu pour les requêtes de persistance (sans implémentation SQL fournie) |
+| `src/Database/Mysql.php` | Création à la demande d'une connexion PDO MySQL |
 | `src/Entity/` | Modèles métier |
 | `templates/` | Fichiers PHP qui génèrent le HTML |
 | `composer.json` | Dépendances et autoload PSR-4 |
@@ -147,6 +148,28 @@ Exercices suggérés : page avec paramètre, service de calcul, puis repository 
 
 **Limites :** ce projet est un point de départ pour l'apprentissage. Il ne fournit ni authentification, ni protection CSRF, ni stratégie de tests applicatifs complète. Ajouter les protections adaptées avant une mise en production.
 
+
+## Connexion MySQL simple (facultative)
+
+Le profil Basic fournit `App\\Database\\Mysql` pour créer une connexion PDO **seulement si une fonctionnalité utilise une base de données**. Le point d'entrée charge le fichier `.env` avec `vlucas/phpdotenv` via `safeLoad()`, mais n'ouvre aucune connexion MySQL au démarrage. Le site d'accueil et les exercices sans SQL fonctionnent sans base de données.
+
+1. Copier `.env.example` vers `.env` puis renseigner les variables `DATABASE_*` (le fichier `.env` est ignoré par Git).
+2. Créer sa base de données MySQL et ses tables.
+3. Créer un repository concret qui hérite de `AbstractRepository` et reçoit un `PDO` dans son constructeur.
+4. Construire explicitement les objets nécessaires, sans autowiring :
+
+```php
+use App\\Database\\Mysql;
+use App\\Repository\\UserRepository; // Exemple : classe à créer dans votre projet
+
+$pdo = Mysql::connectBdd();
+$repository = new UserRepository($pdo);
+```
+
+`Mysql::connectBdd()` échoue avec un message explicite si une variable de connexion manque, ou avec une exception PDO si la connexion échoue. Les exceptions techniques ne doivent pas être affichées aux visiteurs en production.
+
+Cette approche illustre l'injection manuelle : le repository dépend de `PDO`, pas de la classe `Mysql`. `AbstractRepository` conserve uniquement sa connexion PDO ; chaque repository écrit ses propres requêtes préparées et utilise le typage explicite de `bindValue()` décrit plus bas.
+
 ## Convention PDO pour les repositories
 
 Lorsque vous ajoutez une requête SQL avec paramètres :
@@ -161,7 +184,7 @@ Lorsque vous ajoutez une requête SQL avec paramètres :
 Exemple :
 
 ```php
-$stmt = $this->connect->prepare('SELECT * FROM user WHERE id_user = ?');
+$stmt = $this->pdo->prepare('SELECT * FROM user WHERE id_user = ?');
 $stmt->bindValue(1, $id, PDO::PARAM_INT);
 $stmt->execute();
 ```

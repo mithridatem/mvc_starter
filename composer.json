@@ -3,7 +3,8 @@
   "type": "project",
   "require": {
     "php": "^8.2",
-    "mithridatem/router": "^1.7.1"
+    "mithridatem/router": "^1.7.1",
+    "vlucas/phpdotenv": "^5.6"
   },
   "autoload": {
     "psr-4": {
