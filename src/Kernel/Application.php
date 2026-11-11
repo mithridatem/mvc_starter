@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Kernel;
 
+use App\Controller\ErrorController;
 use App\Security\GuestNavigation;
 use Mithridatem\Autowiring\Container;
 use Mithridatem\Routing\Exception\UnauthorizedException;
@@ -23,7 +24,8 @@ final class Application
     public function __construct(private string $rootPath) {}
 
     /**
-     * Démarre l'environnement Web, résout la route et écrit une éventuelle réponse HTML. Les erreurs de dispatch sont déléguées au gestionnaire Web ; les accès invités refusés peuvent déclencher une redirection locale.
+     * Démarre l'environnement Web, résout la route et écrit une éventuelle réponse HTML.
+     * Les exceptions sont transmises au gestionnaire Web, après gestion des redirections invitées.
      * @return void
      */
     public function run(): void
@@ -53,7 +55,7 @@ final class Application
                     return;
                 }
             }
-            (new WebErrorHandler())->handle($error);
+            (new WebErrorHandler($container->get(ErrorController::class)))->handle($error);
         }
     }
 }
