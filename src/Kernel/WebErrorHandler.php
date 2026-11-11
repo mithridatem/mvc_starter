@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Kernel;
 
+use App\Controller\ErrorController;
 use App\Middleware\InvalidCsrfTokenException;
 use Mithridatem\Routing\Exception\MethodNotAllowedException;
 use Mithridatem\Routing\Exception\RouteNotFoundException;
@@ -11,11 +12,14 @@ use Mithridatem\Routing\Exception\RouterException;
 use Mithridatem\Routing\Exception\UnauthorizedException;
 use Throwable;
 
-/** Converts errors into minimal, safely escaped HTML responses. */
+/** Traduit les exceptions en statuts HTTP et délègue le rendu HTML au contrôleur d'erreur. */
 final class WebErrorHandler
 {
+    public function __construct(private ErrorController $errorController) {}
+
     /**
-     * Traduit une exception en réponse HTML échappée et définit le statut HTTP adapté ; masque les erreurs internes (500).
+     * Gère les erreurs HTTP sans divulguer les détails internes.
+     *
      * @param Throwable $error Exception survenue pendant le traitement HTTP.
      * @return void
      */
@@ -35,14 +39,21 @@ final class WebErrorHandler
 
         http_response_code($status);
         header('Content-Type: text/html; charset=utf-8');
+
         if ($error instanceof MethodNotAllowedException) {
             header('Allow: ' . implode(', ', $error->getAllowedMethods()));
         }
 
-        // Do not reveal internals (database errors, paths, stack traces) to clients.
-        $message = $status === 500 ? 'Erreur interne du serveur' : $error->getMessage();
-        echo '<h1>' . $status . '</h1><p>' .
-            htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') .
-            '</p>';
+        try {
+            echo $this->errorController->error($status);
+        } catch (Throwable) {
+            // Même le template d'erreur peut échouer : fournir une réponse sûre.
+            http_response_code(500);
+            header('Content-Type: text/html; charset=utf-8');
+            header_remove('Allow');
+            echo '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Erreur 500</title></head>'
+                . '<body><h1>500 — Erreur interne du serveur</h1>'
+                . '<p>Une erreur est survenue.</p></body></html>';
+        }
     }
 }
