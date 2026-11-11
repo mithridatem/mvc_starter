@@ -22,10 +22,13 @@ composer validate --no-check-publish
 for test in tests/*_test.php tests/security/*.php; do php "$test" || exit 1; done
 ```
 
-## Recette manuelle (avec MySQL / MariaDB)
+## Recette manuelle (MySQL / MariaDB, PostgreSQL ou SQLite)
+
+Lire [docs/databases.md](databases.md) pour sélectionner `DATABASE_DRIVER`, installer l'extension PDO nécessaire et importer le schéma correspondant. Le test `tests/database_connection_test.php` couvre la sélection du driver et un CRUD SQLite temporaire si `pdo_sqlite` est installé.
+
 
 1. Copier `.env.example` vers `.env`, renseigner la connexion SQL sans publier les secrets.
-2. Importer `db.sql` (table utilisateur uniquement).
+2. Importer le schéma correspondant au driver choisi (table utilisateur uniquement).
 3. Démarrer `php -S 127.0.0.1:8000 -t public`.
 4. Vérifier `GET /register` puis l'inscription via POST avec un jeton CSRF valide.
 5. Vérifier l'échec d'un POST sans CSRF ou avec un token invalide (403).
