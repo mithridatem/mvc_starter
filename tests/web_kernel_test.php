@@ -5,6 +5,7 @@ declare(strict_types=1);
 // Run: php tests/web_kernel_test.php
 require dirname(__DIR__) . '/vendor/autoload.php';
 
+use App\Controller\ErrorController;
 use App\Kernel\RouterFactory;
 use App\Kernel\WebErrorHandler;
 use App\Middleware\CsrfMiddleware;
@@ -38,11 +39,12 @@ foreach (['/login', '/register'] as $path) {
 checkKernel($router->getRoutes()->match('POST', '/api/login') === null, 'API route leaked into Web profile');
 checkKernel($router->getRoutes()->match('GET', '/api/profile') === null, 'API profile leaked into Web profile');
 
-$handler = new WebErrorHandler();
+$controller = new ErrorController();
+$handler = new WebErrorHandler($controller);
 foreach ([
-    [new InvalidCsrfTokenException('<invalid>'), 403, '&lt;invalid&gt;'],
-    [new UnauthorizedException(), 403, null],
-    [new RouteNotFoundException(), 404, null],
+    [new InvalidCsrfTokenException('<invalid>'), 403, 'Accès interdit'],
+    [new UnauthorizedException(), 403, 'Accès interdit'],
+    [new RouteNotFoundException(), 404, 'Page introuvable'],
     [new RuntimeException('secret-do-not-display'), 500, 'Erreur interne du serveur'],
 ] as [$error, $status, $expectedText]) {
     ob_start();
@@ -53,9 +55,18 @@ foreach ([
         ob_end_clean();
     }
     checkKernel(http_response_code() === $status, 'Incorrect HTTP status: ' . $status);
-    checkKernel($expectedText === null || str_contains($html, $expectedText), 'Unexpected HTML error response');
-    checkKernel(!str_contains($html, '<invalid>') && !str_contains($html, 'secret-do-not-display'), 'Unescaped or sensitive error');
+    checkKernel(str_contains($html, $expectedText), 'Unexpected HTML error response: ' . $status);
+    checkKernel(str_contains($html, '<!doctype html>'), 'Error view must be a full HTML page');
+    checkKernel(str_contains($html, 'href="/"'), 'Missing navigation link');
+    checkKernel(!str_contains($html, '<invalid>') && !str_contains($html, '&lt;invalid&gt;') && !str_contains($html, 'secret-do-not-display'), 'Sensitive error details leaked');
 }
+
+$loginHtml = $controller->error(401);
+checkKernel(str_contains($loginHtml, 'href="/login"'), '401 must offer login');
+checkKernel(str_contains($loginHtml, 'Se connecter'), 'Missing login action');
+
+$genericHtml = $controller->error(418);
+checkKernel(str_contains($genericHtml, '500'), 'Unknown error status must display generic 500 view');
 
 unset($_SESSION['user']);
 session_write_close();
