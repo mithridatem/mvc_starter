@@ -27,10 +27,12 @@ final class UserRepository extends AbstractRepository
      */
     public function find(int $id): ?User
     {
+        $table = $this->quoteIdentifier('user');
+        $grant = $this->quoteIdentifier('grant');
         $sql = <<<SQL
             SELECT u.id_user, u.firstname, u.lastname, u.email, 
             u.hash_password, u.created_at, u.updated_at, 
-            u.img_profil, u.`grant` FROM `user` AS u 
+            u.img_profil, u.{$grant} FROM {$table} AS u 
             WHERE u.id_user = ?
             ORDER BY u.id_user
             SQL;
@@ -55,9 +57,11 @@ final class UserRepository extends AbstractRepository
      */
     public function findAll(): array
     {
+        $table = $this->quoteIdentifier('user');
+        $grant = $this->quoteIdentifier('grant');
         $sql = <<<SQL
             SELECT u.id_user, u.firstname, u.lastname, u.email, 
-            u.img_profil FROM `user` AS u ORDER BY u.id_user
+            u.img_profil FROM {$table} AS u ORDER BY u.id_user
             SQL;
         return $this->connect
             ->query($sql)
@@ -77,9 +81,11 @@ final class UserRepository extends AbstractRepository
             throw new \InvalidArgumentException('UserRepository attend une entité User.');
         }
 
+        $table = $this->quoteIdentifier('user');
+        $grant = $this->quoteIdentifier('grant');
         $sql = <<<SQL
-            INSERT INTO `user`(firstname, lastname, email, hash_password, created_at,
-            img_profil, `grant`) VALUES (?,?,?,?,?,?,?)
+            INSERT INTO {$table}(firstname, lastname, email, hash_password, created_at,
+            img_profil, {$grant}) VALUES (?,?,?,?,?,?,?)
             SQL;
 
         try {
@@ -115,11 +121,13 @@ final class UserRepository extends AbstractRepository
      */
     public function findByEmail(string $email): ?User
     {
+        $table = $this->quoteIdentifier('user');
+        $grant = $this->quoteIdentifier('grant');
         $sql = <<<SQL
             SELECT u.id_user, u.firstname, u.lastname, u.email,
                    u.hash_password, u.created_at, u.updated_at,
-                   u.img_profil, u.`grant`
-            FROM `user` AS u
+                   u.img_profil, u.{$grant}
+            FROM {$table} AS u
             WHERE u.email = ?
             SQL;
 
@@ -135,5 +143,21 @@ final class UserRepository extends AbstractRepository
         $user = User::hydrate($data);
         $user->setId((int) $data['id_user']);
         return $user;
+    }
+    /**
+     * Protège les deux identifiants SQL réservés selon le moteur PDO.
+     * Les noms sont constants et jamais dérivés des entrées utilisateur.
+     */
+    private function quoteIdentifier(string $identifier): string
+    {
+        if (!in_array($identifier, ['user', 'grant'], true)) {
+            throw new \InvalidArgumentException('Identifiant SQL non autorisé.');
+        }
+
+        return match ($this->connect->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+            'mysql' => "`{$identifier}`",
+            'pgsql', 'sqlite' => '"' . $identifier . '"',
+            default => throw new \RuntimeException('Driver PDO non pris en charge.'),
+        };
     }
 }
