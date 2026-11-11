@@ -88,6 +88,12 @@ final class UserRepository extends AbstractRepository
             img_profil, {$grant}) VALUES (?,?,?,?,?,?,?)
             SQL;
 
+        // PostgreSQL ne garantit pas un identifiant utilisable via lastInsertId() sans séquence.
+        $isPostgresql = $this->connect->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql';
+        if ($isPostgresql) {
+            $sql .= ' RETURNING id_user';
+        }
+
         try {
             $stmt = $this->connect->prepare($sql);
             $firstname = $entity->getFirstname();
@@ -106,7 +112,7 @@ final class UserRepository extends AbstractRepository
             $stmt->bindValue(7, $grant, $grant === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
             $stmt->execute();
 
-            $entity->setId((int) $this->connect->lastInsertId());
+            $entity->setId((int) ($isPostgresql ? $stmt->fetchColumn() : $this->connect->lastInsertId()));
             return $entity;
         } catch (\PDOException $e) {
             // Laisser le service distinguer échec et succès sans afficher une erreur SQL.
