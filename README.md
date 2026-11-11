@@ -33,7 +33,7 @@ composer install
 php -S 127.0.0.1:8000 -t public
 ```
 
-Parcours : `GET /login`, `POST /login`, `GET /register`, `POST /register`. Les requêtes POST sont protégées par `CsrfMiddleware`. Une soumission sans token valide provoque une réponse HTTP 403. Le contrôleur ne traite que les DTO et les cas d'utilisation. Les rôles Web continuent de provenir de la session PHP : `AuthenticationAwareGrantChecker` délègue les rôles à `ArrayGrantChecker` et ajoute `IS_GUEST` / `IS_AUTHENTICATED`. Les routes `/login` et `/register` sont réservées aux invités en GET et POST ; un utilisateur connecté est redirigé vers la dernière page GET autorisée ou un repli local (`/` par défaut). Voir [docs/guest-navigation.md](docs/guest-navigation.md).
+Parcours : `GET /login`, `POST /login`, `GET /register`, `POST /register`. Les requêtes POST sont protégées par `CsrfMiddleware`. Une soumission sans token valide provoque une réponse HTTP 403 avec une page HTML et un lien vers l'accueil. Le contrôleur ne traite que les DTO et les cas d'utilisation. Les rôles Web continuent de provenir de la session PHP : `AuthenticationAwareGrantChecker` délègue les rôles à `ArrayGrantChecker` et ajoute `IS_GUEST` / `IS_AUTHENTICATED`. Les routes `/login` et `/register` sont réservées aux invités en GET et POST ; un utilisateur connecté est redirigé vers la dernière page GET autorisée ou un repli local (`/` par défaut). Voir [docs/guest-navigation.md](docs/guest-navigation.md).
 
 ## Architecture
 
@@ -41,7 +41,9 @@ Parcours : `GET /login`, `POST /login`, `GET /register`, `POST /register`. Les r
 - `src/Kernel/Application.php` : orchestration du démarrage.
 - `src/Kernel/WebBootstrap.php` : chargement de l'environnement, en-têtes et session PHP.
 - `src/Kernel/RouterFactory.php` : routeur, résolveurs, grants et découverte des routes.
-- `src/Kernel/WebErrorHandler.php` : traitement centralisé des exceptions HTML.
+- `src/Kernel/WebErrorHandler.php` : traduction des exceptions en statuts et en-têtes HTTP, avec rendu HTML de secours.
+- `src/Controller/ErrorController.php` : choix du message et du lien de navigation selon le statut HTTP.
+- `template/template_error.php` : page HTML générique pour les erreurs (sans exposition des détails techniques).
 - `src/Middleware/CsrfMiddleware.php` : vérification des tokens avant exécution du contrôleur.
 - `src/Middleware/ContainerMiddlewareResolver.php` : adaptation au conteneur autowiring.
 - `src/Security/GuestNavigation.php` : mémorisation en session et redirection des utilisateurs déjà connectés.
@@ -51,6 +53,10 @@ Parcours : `GET /login`, `POST /login`, `GET /register`, `POST /register`. Les r
 - `config/service.php` : fabrique PDO et configuration upload.
 
 La correction d'hydratation de l'entité `User`, le DSN MySQL et les placeholders du générateur sont conservés.
+
+## Pages d'erreur HTML
+
+Le `WebErrorHandler` conserve la traduction des exceptions en statuts HTTP (403, 404, 405, 500), ainsi que l'en-tête `Allow` des erreurs 405. Il délègue directement le rendu à `ErrorController::error()` sans repasser par le routeur. Le template unique `template/template_error.php` contient un lien de retour à l'accueil (ou de connexion pour 401). Les détails des exceptions ne sont jamais affichés ; un HTML minimal prend le relais si le template échoue. Les redirections `IS_GUEST` restent gérées par `Application`.
 
 ## Validation avant synchronisation
 
