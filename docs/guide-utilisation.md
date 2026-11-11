@@ -6,7 +6,7 @@ Ce guide décrit **les fichiers effectivement générés**, synchronisés avec l
 
 ## 1. Préparer l'environnement
 
-Pré requis : PHP 8.2+, Composer, MySQL ou MariaDB, extension `pdo_mysql`.
+Pré requis : PHP 8.2+, Composer et une extension PDO adaptée au moteur choisi : `pdo_mysql`, `pdo_pgsql` ou `pdo_sqlite`.
 
 ```bash
 composer install
@@ -16,7 +16,7 @@ composer install
 php -S 127.0.0.1:8000 -t public
 ```
 
-Le générateur a créé `.env` et remplacé le nom de base dans `db.sql`. Ne jamais versionner `.env`.
+La configuration utilise `DATABASE_DRIVER` (par défaut `mysql`) ; voir [le guide des bases de données](databases.md) pour PostgreSQL et SQLite. Ne jamais versionner `.env`.
 
 Visiter `/`, `/register` puis `/login`. L'inscription crée un compte ; la connexion met l'utilisateur en session.
 
@@ -115,9 +115,11 @@ Les classes concrètes sont résolues automatiquement lorsque le conteneur peut 
 ```php
 $container->factory(
     PDO::class,
-    static fn (): PDO => Mysql::connectBdd()
+    static fn (): PDO => ConnectionFactory::create()->connect()
 );
 ```
+
+L'interface `ConnectionInterface` et les adaptateurs `Mysql`, `Postgresql`, `Sqlite` isolent les détails de connexion ; les repositories reçoivent toujours `PDO`.
 
 Pour un paramètre scalaire, utiliser `configure()`, comme pour `UploadFileService`. Les services métiers ne doivent pas manipuler eux-mêmes le conteneur.
 
@@ -144,6 +146,8 @@ Les deux méthodes utilisent un buffer interne commun, nettoyé en cas d'excepti
 Vérifier ce comportement avec `php tests/template_render_test.php` et `php tests/auth_form_render_test.php`.
 
 ## 7. Tests et vérifications
+
+Exécuter `php tests/database_connection_test.php` pour tester la sélection de l'adaptateur et le CRUD SQLite lorsqu'il est disponible.
 
 ```bash
 php tests/environment_loader_test.php
