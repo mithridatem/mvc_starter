@@ -6,12 +6,12 @@ Ce guide décrit **le squelette actuel**, synchronisé avec `project_exemple:var
 
 ## 1. Installation
 
-Prérequis : PHP 8.2+, Composer, MySQL ou MariaDB, extensions PDO adaptées.
+Prérequis : PHP 8.2+, Composer et une extension PDO correspondant au moteur choisi (`pdo_mysql`, `pdo_pgsql` ou `pdo_sqlite`).
 
 ```bash
 composer install
 # Vérifier les variables DATABASE_* dans .env
-# Créer les tables en important db.sql
+# Initialiser le schéma adapté : db.sql ou database/{postgresql,sqlite}.sql
 php -S 127.0.0.1:8000 -t public
 ```
 
@@ -67,6 +67,8 @@ Le client doit transmettre l'en-tête `Authorization` à chaque appel protégé.
 | `src/Kernel/RouterFactory.php` | Configure le pipeline JWT, les grants et la découverte des routes |
 | `src/Kernel/ApiErrorHandler.php` | Convertit les exceptions en réponses JSON HTTP sans divulguer les erreurs internes |
 | `config/service.php` | Configuration du conteneur, fabrique PDO et paramètres JWT |
+| `src/Database/ConnectionInterface.php` | Contrat de création d'une connexion PDO |
+| `src/Database/ConnectionFactory.php` | Sélection du moteur via `DATABASE_DRIVER` |
 | `src/Controller/Api/` | Endpoints et sérialisation des réponses |
 | `src/DTO/LoginInput.php` | Normalisation des données du login |
 | `src/Service/LoginService.php` | Cas d'utilisation de connexion |
@@ -114,9 +116,16 @@ Ce contrôleur doit se trouver dans `App\Controller\Api`. Toutes ses actions hé
 
 Les contrôles de signature, de date d'expiration et des claims JWT sont effectués par `JwtTokenManager`.
 
+## Choisir la base de données
+
+`DATABASE_DRIVER=mysql` reste la valeur par défaut. Les valeurs `pgsql` et `sqlite` utilisent respectivement PostgreSQL et SQLite. La factory résout l'implémentation `ConnectionInterface` et fournit `PDO` aux repositories existants ; les contrôleurs API et le mécanisme JWT ne changent pas.
+
+Consulter [le guide multi-base](databases.md) pour les extensions PHP et l'import des schémas.
+
 ## 7. Tests
 
 ```bash
+php tests/database_connection_test.php
 php tests/environment_loader_test.php
 php tests/api_kernel_test.php
 php tests/login_input_test.php
@@ -162,7 +171,7 @@ Le gestionnaire JWT refuse un `JWT_TTL_SECONDS` nul ou négatif.
 Les scénarios de claims, signatures, durées et isolation de l'identité sont
 vérifiés avec `php tests/jwt_security_edge_test.php`.
 
-Ces tests ne remplacent pas une validation avec une base MySQL réelle,
+Ces tests ne remplacent pas une validation avec une base SQL réelle,
 un serveur HTTP et des paramètres HTTPS de production.
 
 ## Convention PDO pour les repositories
