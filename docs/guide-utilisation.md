@@ -11,9 +11,9 @@ composer install
 php -S 127.0.0.1:8000 -t public
 ```
 
-Ouvrir [http://127.0.0.1:8000/](http://127.0.0.1:8000/). Il n'est pas nécessaire de créer une base MySQL pour afficher l'accueil.
+Ouvrir [http://127.0.0.1:8000/](http://127.0.0.1:8000/). Il n'est pas nécessaire de créer une base de données pour afficher l'accueil.
 
-Le fichier `.env` est chargé s'il existe, mais aucune connexion MySQL n'est ouverte au démarrage.
+Le fichier `.env` est chargé s'il existe, mais aucune connexion SQL n'est ouverte au démarrage.
 
 ## 2. Comprendre le parcours d'une requête
 
@@ -39,7 +39,9 @@ AbstractController::render() -> templates/home.php -> HTML
 | `src/Controller/` | Reçoit la demande HTTP et décide du rendu |
 | `src/Service/` | Regroupe la logique métier |
 | `src/Repository/` | Emplacement prévu pour les requêtes de persistance (sans implémentation SQL fournie) |
-| `src/Database/Mysql.php` | Création à la demande d'une connexion PDO MySQL |
+| `src/Database/ConnectionInterface.php` | Contrat simple pour fournir un objet PDO |
+| `src/Database/ConnectionFactory.php` | Sélection de MySQL, PostgreSQL ou SQLite via `DATABASE_DRIVER` |
+| `src/Database/Mysql.php`, `Postgresql.php`, `Sqlite.php` | Création à la demande d'une connexion PDO |
 | `src/Entity/` | Modèles métier |
 | `templates/` | Fichiers PHP qui génèrent le HTML |
 | `composer.json` | Dépendances et autoload PSR-4 |
@@ -149,12 +151,12 @@ Exercices suggérés : page avec paramètre, service de calcul, puis repository 
 **Limites :** ce projet est un point de départ pour l'apprentissage. Il ne fournit ni authentification, ni protection CSRF, ni stratégie de tests applicatifs complète. Ajouter les protections adaptées avant une mise en production.
 
 
-## Connexion MySQL simple (facultative)
+## Connexion PDO multi-base (facultative)
 
-Le profil Basic fournit `App\\Database\\Mysql` pour créer une connexion PDO **seulement si une fonctionnalité utilise une base de données**. Le point d'entrée charge le fichier `.env` avec `vlucas/phpdotenv` via `safeLoad()`, mais n'ouvre aucune connexion MySQL au démarrage. Le site d'accueil et les exercices sans SQL fonctionnent sans base de données.
+Le profil Basic fournit `App\\Database\\Mysql` pour créer une connexion PDO **seulement si une fonctionnalité utilise une base de données**. Le point d'entrée charge le fichier `.env` avec `vlucas/phpdotenv` via `safeLoad()`, mais n'ouvre aucune connexion au démarrage. Le site d'accueil et les exercices sans SQL fonctionnent sans base de données.
 
-1. Copier `.env.example` vers `.env` puis renseigner les variables `DATABASE_*` (le fichier `.env` est ignoré par Git).
-2. Créer sa base de données MySQL et ses tables.
+1. Copier `.env.example` vers `.env`, choisir `DATABASE_DRIVER=mysql|pgsql|sqlite` et renseigner les variables adaptées (le fichier `.env` est ignoré par Git).
+2. Créer sa base et ses tables, ou utiliser un fichier SQLite dans `var/`.
 3. Créer un repository concret qui hérite de `AbstractRepository` et reçoit un `PDO` dans son constructeur.
 4. Construire explicitement les objets nécessaires, sans autowiring :
 
@@ -162,11 +164,13 @@ Le profil Basic fournit `App\\Database\\Mysql` pour créer une connexion PDO **s
 use App\\Database\\Mysql;
 use App\\Repository\\UserRepository; // Exemple : classe à créer dans votre projet
 
-$pdo = Mysql::connectBdd();
+$pdo = ConnectionFactory::create()->connect();
 $repository = new UserRepository($pdo);
 ```
 
-`Mysql::connectBdd()` échoue avec un message explicite si une variable de connexion manque, ou avec une exception PDO si la connexion échoue. Les exceptions techniques ne doivent pas être affichées aux visiteurs en production.
+`Mysql::connectBdd()` reste disponible pour les exercices existants. La factory sélectionne une implémentation du contrat et retourne `PDO`. Consulter [le guide des moteurs SQL](databases.md) pour les extensions et le chemin SQLite. Les exceptions techniques ne doivent pas être affichées aux visiteurs en production.
+
+Exécuter `php tests/database_connection_test.php` pour valider la sélection des moteurs et un exemple SQLite.
 
 Cette approche illustre l'injection manuelle : le repository dépend de `PDO`, pas de la classe `Mysql`. `AbstractRepository` conserve uniquement sa connexion PDO ; chaque repository écrit ses propres requêtes préparées et utilise le typage explicite de `bindValue()` décrit plus bas.
 

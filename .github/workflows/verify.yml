@@ -10,8 +10,10 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+          extensions: pdo_mysql, pdo_pgsql, pdo_sqlite
           tools: composer:v2
       - run: composer install --no-interaction --prefer-dist
       - name: PHP syntax
         run: find src public tests templates -name '*.php' -print0 | xargs -0 -n1 php -l
       - run: php tests/form_request_test.php
+      - run: php tests/database_connection_test.php
