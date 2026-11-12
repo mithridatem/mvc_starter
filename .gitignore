@@ -2,3 +2,8 @@
 /.env
 /.idea/
 /.vscode/
+
+# SQLite local (ne jamais publier une base contenant des données)
+/var/*.sqlite
+/var/*.sqlite-*
+/var/*.db
