@@ -59,13 +59,20 @@ curl http://127.0.0.1:8000/api/profile \
 
 `Controller/Api` : endpoints JSON ; `Security/Jwt` : émission et validation ; `Security/Authentication` : identité pendant la requête ; `Middleware` : contrôle transversal ; `Repository` : PDO ; `Service` : métier.
 
+## Connexion multi-base de données
+
+Le profil API prend en charge **MySQL/MariaDB**, **PostgreSQL** et **SQLite** via `ConnectionInterface`, `ConnectionFactory` et les implémentations PDO. Choisir `DATABASE_DRIVER=mysql|pgsql|sqlite` dans `.env` (MySQL reste le défaut). Les services et les endpoints JWT conservent leurs comportements ; les repositories reçoivent toujours `PDO` par injection. Des schémas adaptés sont fournis dans `db.sql`, `database/postgresql.sql` et `database/sqlite.sql`.
+
+Consulter [docs/databases.md](docs/databases.md) pour installer le driver PHP, initialiser le schéma et choisir la connexion. Aucun transfert automatique de données n'est effectué.
+
 ## Validation avant synchronisation
 
-Voir [docs/validation-starter.md](docs/validation-starter.md) pour la matrice CI, les tests adversariaux JWT et la recette manuelle MySQL.
+Voir [docs/validation-starter.md](docs/validation-starter.md) pour la matrice CI, les tests adversariaux JWT et la recette manuelle sur les trois moteurs.
 
 ## Vérification
 
 ```sh
+php tests/database_connection_test.php
 php tests/environment_loader_test.php
 php tests/api_kernel_test.php
 php tests/login_input_test.php
