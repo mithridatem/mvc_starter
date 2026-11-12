@@ -13,6 +13,11 @@ final class SimulatedDatabaseFailure extends PDO
 {
     public function __construct() {}
 
+    public function getAttribute(int $attribute): mixed
+    {
+        return $attribute === PDO::ATTR_DRIVER_NAME ? 'mysql' : null;
+    }
+
     public function prepare(string $query, array $options = []): PDOStatement|false
     {
         throw new PDOException('internal SQL detail: private_database_name');
