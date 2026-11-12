@@ -17,7 +17,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: mbstring, intl, pdo_mysql
+          extensions: mbstring, intl, pdo_mysql, pdo_pgsql, pdo_sqlite
           tools: composer:v2
           coverage: none
       - name: Validate Composer manifest
@@ -35,6 +35,8 @@ jobs:
       - name: Starter structure and API isolation
         run: |
           test -f db.sql
+          test -f database/postgresql.sql
+          test -f database/sqlite.sql
           test -f .env.example
           test -f docs/guide-utilisation.md
           grep -q 'CREATE TABLE IF NOT EXISTS `user`' db.sql
