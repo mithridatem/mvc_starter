@@ -24,14 +24,16 @@ composer validate --no-check-publish
 for test in tests/*_test.php tests/security/*.php; do php "$test" || exit 1; done
 ```
 
-## Recette manuelle (MySQL / MariaDB)
+## Recette manuelle (MySQL / MariaDB, PostgreSQL, SQLite)
+
+Consulter [le guide de configuration SQL](databases.md) : choisir `DATABASE_DRIVER`, installer l'extension PDO appropriée, importer le schéma du moteur, puis reprendre la validation JWT. La CI teste la sélection des adaptateurs et le CRUD utilisateur SQLite sur une base temporaire ; les validations PostgreSQL/MySQL avec serveurs réels restent manuelles.
 
 1. Copier `.env.example` dans `.env` et définir `APP_ENV=dev`.
 2. Définir `JWT_SECRET` avec **64 caractères hexadécimaux aléatoires**, par exemple
    `php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'`. Ne jamais le committer.
 3. Conserver `JWT_ISSUER=mvc-starter` et `JWT_AUDIENCE=mvc-starter-api`
    (ou personnaliser les deux valeurs de façon cohérente).
-4. Configurer la base et importer `db.sql` (table utilisateur seulement).
+4. Configurer la base et importer `db.sql`, `database/postgresql.sql` ou `database/sqlite.sql` selon le moteur (table utilisateur seulement).
 5. Démarrer `php -S 127.0.0.1:8000 -t public`.
 6. Créer un utilisateur de test **avec un hash** issu de `password_hash` et le
    rôle `ROLE_USER` dans la base de test.
