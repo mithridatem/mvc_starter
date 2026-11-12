@@ -12,13 +12,22 @@ use RuntimeException;
  *
  * Les variables DATABASE_* sont chargées depuis .env par le point d'entrée.
  */
-final class Mysql
+final class Mysql implements ConnectionInterface
 {
+    /** Connexion conforme au contrat commun, sans dépendance à un conteneur. */
+    public function connect(): PDO
+    {
+        return self::connectBdd();
+    }
+
     /**
      * @return PDO Connexion MySQL prête à être injectée dans un repository.
      */
     public static function connectBdd(): PDO
     {
+        if (!extension_loaded('pdo_mysql')) {
+            throw new RuntimeException('Extension PHP pdo_mysql requise.');
+        }
         $required = [
             'DATABASE_HOST',
             'DATABASE_PORT',
