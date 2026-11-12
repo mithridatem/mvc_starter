@@ -42,8 +42,12 @@ php tests/form_request_test.php
 - `src/Controller` : entrée/sortie HTTP.
 - `src/Service` : logique métier.
 - `src/Repository` : persistance PDO.
-- `src/Database/Mysql.php` : connexion PDO MySQL facultative.
+- `src/Database/ConnectionInterface.php` : contrat commun de connexion PDO.
+- `src/Database/ConnectionFactory.php` : choix du moteur MySQL, PostgreSQL ou SQLite.
+- `src/Database/Mysql.php`, `Postgresql.php`, `Sqlite.php` : connexions facultatives.
 - `src/Entity` : objets métier.
 - `templates` : vues.
 
-Le squelette n'a pas besoin de MySQL pour la page d'accueil. Le fichier `.env`, s'il existe, est chargé par Dotenv, sans établir de connexion MySQL au démarrage. Pour utiliser une base : copier `.env.example` en `.env`, compléter les paramètres et appeler `Mysql::connectBdd()` au moment de construire un repository. Voir le guide d'utilisation.
+Le squelette n'a pas besoin de base de données pour la page d'accueil. Le fichier `.env`, s'il existe, est chargé par Dotenv, sans établir de connexion au démarrage. Pour utiliser une base : copier `.env.example` en `.env`, renseigner `DATABASE_DRIVER=mysql|pgsql|sqlite`, puis appeler `ConnectionFactory::create()->connect()` lors de la construction d'un repository. `Mysql::connectBdd()` reste compatible avec les anciens exercices. Voir [le guide des bases de données](docs/databases.md) et le guide d'utilisation.
+
+Tests : `php tests/form_request_test.php` et `php tests/database_connection_test.php`.
