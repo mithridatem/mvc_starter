@@ -52,7 +52,13 @@ Parcours : `GET /login`, `POST /login`, `GET /register`, `POST /register`. Les r
 - `src/DTO` : entrées validées ; `src/Service` : métier ; `src/Repository` : accès PDO.
 - `config/service.php` : fabrique PDO et configuration upload.
 
-La correction d'hydratation de l'entité `User`, le DSN MySQL et les placeholders du générateur sont conservés.
+La correction d'hydratation de l'entité `User` et les placeholders SQL sont conservés.
+
+## Bases de données (MySQL, PostgreSQL, SQLite)
+
+Le profil Web utilise désormais `ConnectionInterface` et `ConnectionFactory` pour choisir son adaptateur PDO avec `DATABASE_DRIVER=mysql|pgsql|sqlite`. MySQL/MariaDB reste le choix par défaut. Les repositories conservent leur injection de `PDO`, sans ORM supplémentaire. Les schémas sont dans `db.sql` (MySQL), `database/postgresql.sql` et `database/sqlite.sql` ; les données ne sont pas migrées automatiquement.
+
+Consulter [le guide des bases de données](docs/databases.md) pour la configuration des extensions PHP et l'initialisation des schémas.
 
 ## Pages d'erreur HTML
 
@@ -65,6 +71,7 @@ La procédure de validation de cette branche, comprenant la CI multi-versions et
 ## Tests
 
 ```bash
+php tests/database_connection_test.php
 php tests/environment_loader_test.php
 php tests/web_kernel_test.php
 php tests/guest_navigation_test.php

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Database\Mysql;
+use App\Database\ConnectionFactory;
 use App\Service\UploadFileService;
 use Mithridatem\Autowiring\Container;
 
@@ -10,7 +10,7 @@ return static function (Container $container): void {
     // Connexion créée au premier besoin, puis partagée.
     $container->factory(
         PDO::class,
-        static fn (): PDO => Mysql::connectBdd()
+        static fn (): PDO => ConnectionFactory::create()->connect()
     );
 
     // Service d'upload fourni comme exemple d'injection d'un paramètre scalaire.
