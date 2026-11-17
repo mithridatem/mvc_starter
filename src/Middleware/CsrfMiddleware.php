@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
-use App\Security\CsrfTokenManager;
+use App\Security\CsrfTokenManagerInterface;
 use Mithridatem\Routing\Context\RequestContextInterface;
 use Mithridatem\Routing\Http\RequestInterface;
 use Mithridatem\Routing\Middleware\MiddlewareInterface;
@@ -19,9 +19,9 @@ final class CsrfMiddleware implements MiddlewareInterface
 {
     /**
      *
-     * @param CsrfTokenManager $tokens Gestionnaire des jetons CSRF associés à la session.
+     * @param CsrfTokenManagerInterface $tokens Stratégie CSRF sélectionnée dans le conteneur.
      */
-    public function __construct(private CsrfTokenManager $tokens) {}
+    public function __construct(private CsrfTokenManagerInterface $tokens) {}
 
     /**
      * Vérifie le jeton CSRF d'une requête POST avant de passer au prochain traitement. Le chemin HTTP est utilisé comme identifiant du formulaire.
