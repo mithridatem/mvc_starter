@@ -6,7 +6,7 @@ namespace App\Controller;
 
 use App\DTO\LoginInput;
 use App\Middleware\CsrfMiddleware;
-use App\Security\CsrfTokenManager;
+use App\Security\CsrfTokenManagerInterface;
 use App\Security\UserSessionManager;
 use App\Service\LoginService;
 use Mithridatem\Routing\Attribute\Route;
@@ -19,7 +19,7 @@ final class LoginController extends AbstractController
     public function __construct(
         private LoginService $loginService,
         private UserSessionManager $session,
-        private CsrfTokenManager $csrf,
+        private CsrfTokenManagerInterface $csrf,
     ) {}
 
     #[Route(path: '/', method: 'GET', grants: ['IS_GUEST'])]
