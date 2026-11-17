@@ -47,7 +47,8 @@ Parcours : `GET /login`, `POST /login`, `GET /register`, `POST /register`. Les r
 - `src/Middleware/CsrfMiddleware.php` : vérification des tokens avant exécution du contrôleur.
 - `src/Middleware/ContainerMiddlewareResolver.php` : adaptation au conteneur autowiring.
 - `src/Security/GuestNavigation.php` : mémorisation en session et redirection des utilisateurs déjà connectés.
-- `src/Security/CsrfTokenManager.php` : génération et validation par session.
+- `src/Security/CsrfTokenManager.php` : génération et validation par session (par défaut).
+- `src/Security/StatelessCsrfTokenManager.php` : alternative CSRF stateless avec cookie navigateur et signature HMAC ; configuration via `CSRF_MODE`, voir [comparaison des stratégies](docs/csrf-strategies.md).
 - `src/Controller` : traitements HTTP, templates HTML.
 - `src/DTO` : entrées validées ; `src/Service` : métier ; `src/Repository` : accès PDO.
 - `config/service.php` : fabrique PDO et configuration upload.
@@ -78,6 +79,7 @@ php tests/guest_navigation_test.php
 php tests/login_input_test.php
 php tests/register_user_input_test.php
 php tests/csrf_token_manager_test.php
+php tests/stateless_csrf_token_manager_test.php
 php tests/csrf_middleware_test.php
 php tests/csrf_route_configuration_test.php
 php tests/form_submission_test.php
