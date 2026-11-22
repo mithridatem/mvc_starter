@@ -4,7 +4,7 @@ Cette application utilise le pipeline générique de `mithridatem/router`. Le ro
 
 ## Répartition des responsabilités
 
-- `App\Security\CsrfTokenManager` génère et vérifie des tokens stockés en session, associés à un identifiant serveur.
+- `App\Security\CsrfTokenManager` constitue la stratégie historique de tokens stockés en session. L'alternative `StatelessCsrfTokenManager` utilise un cookie propre au navigateur et une signature HMAC sans stockage CSRF en session. Voir [comparaison des stratégies](csrf-strategies.md).
 - `App\Middleware\CsrfMiddleware` vérifie le token reçu dans `csrf_token` **avant** le contrôleur, uniquement sur les routes POST protégées.
 - `App\Middleware\ContainerMiddlewareResolver` permet l'injection des dépendances du middleware.
 - `App\Middleware\InvalidCsrfTokenException` signale un refus ; `public/index.php` renvoie HTTP 403.
@@ -66,7 +66,7 @@ L'identifiant est fixé côté serveur à partir du chemin HTTP, **jamais depuis
 - Si plusieurs formulaires soumettent vers la **même URL**, ils utilisent le même identifiant et donc le même token CSRF. Pour les distinguer, il faudrait faire évoluer le contrat (métadonnées de route ou identifiant explicite côté serveur).
 - Il faut utiliser le même format de chemin lors de la génération et de la validation (préfixes, slash final, sous-répertoire/basePath). Il n'existe pas ici de générateur de noms de routes.
 - Le middleware n'est attaché qu'aux routes `POST` : toute autre méthode à effet de bord doit être protégée séparément avant d'être introduite.
-- Les tokens sont stables pendant la session ; ils ne sont pas à usage unique.
+- En mode session, les tokens sont stables pendant la session ; en mode stateless, ils expirent après une heure. Aucun des deux modes n'impose un usage unique.
 
 ## En cas de token invalide
 

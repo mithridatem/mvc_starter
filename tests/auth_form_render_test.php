@@ -22,7 +22,7 @@ function formRequest(string $method, array $post = []): Request
     return new Request('/', $method, post: $post);
 }
 
-function controllerForRender(string $class, CsrfTokenManager $csrf): object
+function controllerForRender(string $class, \App\Security\CsrfTokenManagerInterface $csrf): object
 {
     // Les chemins testés n'appellent ni LoginService ni UserService :
     // on évite de construire leur graphe de dépendances SQL.

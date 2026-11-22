@@ -6,7 +6,7 @@ namespace App\Controller;
 
 use App\DTO\RegisterUserInput;
 use App\Middleware\CsrfMiddleware;
-use App\Security\CsrfTokenManager;
+use App\Security\CsrfTokenManagerInterface;
 use App\Service\UserService;
 use Mithridatem\Routing\Attribute\Route;
 use Mithridatem\Routing\Attribute\RouteGroup;
@@ -17,7 +17,7 @@ final class RegisterController extends AbstractController
 {
     public function __construct(
         private UserService $userService,
-        private CsrfTokenManager $csrf,
+        private CsrfTokenManagerInterface $csrf,
     ) {}
 
     #[Route(path: '/', method: 'GET', grants: ['IS_GUEST'])]

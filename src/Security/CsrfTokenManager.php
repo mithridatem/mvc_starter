@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
-final class CsrfTokenManager
+final class CsrfTokenManager implements CsrfTokenManagerInterface
 {
     /**
      * Méthode qui génére un token CSRF
